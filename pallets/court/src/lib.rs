@@ -241,10 +241,6 @@ pub mod pallet {
 			let defendent = T::Lookup::lookup(defendent)?;
 			ensure!(statement.len() < 512, Error::<T, I>::StatementOverSize);
 
-			let mut arr = [0u8; 512];
-
-			arr[..statement.len()].copy_from_slice(&&statement[..]);
-
 			let c = Self::proposal_count();
 			<ProposalCount<T, I>>::put(c + 1);
 			let proposal = Lawsuit {

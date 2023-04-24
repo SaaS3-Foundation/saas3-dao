@@ -461,14 +461,12 @@ impl pallet_treasury::Config for Runtime {
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
 	type PalletId = TreasuryPalletId;
-	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type SpendOrigin = EnsureWithSuccess<EnsureRoot<AccountId>, AccountId, MaxBalance>;
 }
 
 impl pallet_court::Config for Runtime {
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = pallet_court::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
 }
 
