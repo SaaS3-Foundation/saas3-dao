@@ -1,22 +1,25 @@
-# Substrate Cumulus Parachain Template
+# SaaS3 DAO
 
-A new [Cumulus](https://github.com/paritytech/cumulus/)-based Substrate node, ready for hacking ☁️..
+SaaS3 DAO refers to the decentralized autonomous organization (DAO), a governance body established with a full-fledged mechanism for token economics. The platform runs on the Substrate blockchain and uses two pallets: `pallet-treasury` and `pallet-court`. `pallet-treasury` is used for collecting funds, while `pallet-court` is used to resolve disputes between users of the SaaS3 oracle.
 
-This project is originally a fork of the
-[Substrate Node Template](https://github.com/substrate-developer-hub/substrate-node-template)
-modified to include dependencies required for registering this node as a **parathread** or
-**parachain** to a **relay chain**.
+## pallet-treasury
 
-The stand-alone version of this template is hosted on the
-[Substrate Devhub Parachain Template](https://github.com/substrate-developer-hub/substrate-parachain-template/)
-for each release of Polkadot. It is generated directly to the upstream
-[Parachain Template in Cumulus](https://github.com/paritytech/cumulus/tree/master/parachain-template)
-at each release branch using the
-[Substrate Template Generator](https://github.com/paritytech/substrate-template-generator/).
+The `pallet-treasury` pallet is responsible for collecting and managing funds for the SaaS3 DAO platform.
 
-👉 Learn more about parachains [here](https://wiki.polkadot.network/docs/learn-parachains), and
-parathreads [here](https://wiki.polkadot.network/docs/learn-parathreads).
+## pallet-court
 
+The `pallet-court` pallet provides a platform for resolving disputes between users of the SaaS3 oracle. When a dispute arises, users can submit evidence to support their case. A panel of judges is then selected to review the evidence and make a ruling. If the ruling is in favor of the plaintiff, they are awarded a reward from the defendant's bond.
 
-🧙 Learn about how to use this template and run your own parachain testnet for it in the
-[Devhub Cumulus Tutorial](https://docs.substrate.io/tutorials/v3/cumulus/start-relay/).
+## Building and Testing
+
+To build the SaaS3 DAO project, run the following command:
+
+```
+cargo +nightly build --release
+```
+
+To run tests, use the following command:
+
+```
+cargo +nightly test
+```
