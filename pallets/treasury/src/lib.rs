@@ -46,7 +46,6 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod benchmarking;
 #[cfg(test)]
 mod tests;
 
@@ -94,7 +93,7 @@ pub mod pallet {
 	pub struct Pallet<T, I = ()>(PhantomData<(T, I)>);
 
 	#[pallet::config]
-	pub trait Config<I: 'static = ()>: frame_system::Config + pallet_court::Config {
+	pub trait Config<I: 'static = ()>: frame_system::Config + pallet_court::Config<I> {
 		/// The staking balance.
 		type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 
@@ -105,11 +104,6 @@ pub mod pallet {
 		/// The treasury's pallet id, used for deriving its sovereign account ID.
 		#[pallet::constant]
 		type PalletId: Get<PalletId>;
-
-		/// The origin required for approving spends from the treasury outside of the proposal
-		/// process. The `Success` value is the maximum amount that this origin is allowed to
-		/// spend at a time.
-		type SpendOrigin: EnsureOrigin<Self::RuntimeOrigin, Success = BalanceOf<Self, I>>;
 	}
 
 	/// Number of proposals that have been made.
@@ -127,6 +121,12 @@ pub mod pallet {
 		Record<T::AccountId, BalanceOf<T, I>>,
 		OptionQuery,
 	>;
+
+	/// Claims that have been made
+	#[pallet::storage]
+	#[pallet::getter(fn claims)]
+	pub type Claims<T: Config<I>, I: 'static = ()> =
+		StorageMap<_, Twox64Concat, T::AccountId, BalanceOf<T, I>, OptionQuery>;
 
 	#[pallet::genesis_config]
 	pub struct GenesisConfig;
@@ -196,6 +196,7 @@ pub mod pallet {
 		InsufficientFund,
 		/// Rewards claim has not been approved.
 		ClaimNotApproved,
+		ExceedClaim,
 	}
 
 	#[pallet::hooks]
@@ -211,7 +212,7 @@ pub mod pallet {
 	impl<T: Config<I>, I: 'static> Pallet<T, I> {
 		/// Receive funds and save to treasury pot.
 		///
-		/// - `origin`: Must be `SpendOrigin` with the `Success` value being at least `amount`.
+		/// - `origin`:
 		/// - `amount`: The amount to be transferred from origin to the treasury pot.
 		/// - `category_type`: The source type of funds
 		///
@@ -223,12 +224,13 @@ pub mod pallet {
 			category_type: u32,
 		) -> DispatchResult {
 			let sender = ensure_signed(origin.clone())?;
-			let max_amount = T::SpendOrigin::ensure_origin(origin)?;
-			ensure!(amount <= max_amount, Error::<T, I>::InsufficientPermission);
+			ensure!(
+				<T as pallet::Config<I>>::Currency::free_balance(&sender) >= amount,
+				Error::<T, I>::InsufficientFund
+			);
 			let to = Self::account_id();
 			<T as pallet::Config<I>>::Currency::transfer(&sender, &to, amount, KeepAlive)?;
 
-			// TODO
 			// record funds
 			let c = Self::record_count();
 			<RecordCount<T, I>>::put(c + 1);
@@ -260,10 +262,20 @@ pub mod pallet {
 
 			let account_id = Self::account_id();
 
-			// TODO
 			// fetch ended lawsuit
+			let cnt = pallet_court::Pallet::<T, I>::contribution(beneficiary.clone());
+			let bc = BalanceOf::<T, I>::from(cnt);
+
 			// calculate rewards - claimed rewards
-			//
+			let c = Claims::<T, I>::get(&beneficiary);
+			if let Some(c) = c {
+				// there are claims
+				ensure!(bc - c > amount, Error::<T, I>::ExceedClaim);
+				Claims::<T, I>::mutate(&beneficiary, |v| *v = Some(c + amount));
+			} else {
+				ensure!(bc > amount, Error::<T, I>::ExceedClaim);
+				Claims::<T, I>::insert(&beneficiary, amount);
+			}
 
 			<T as pallet::Config<I>>::Currency::transfer(
 				&account_id,

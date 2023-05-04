@@ -38,7 +38,6 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod benchmarking;
 #[cfg(test)]
 mod tests;
 
@@ -74,9 +73,9 @@ pub struct Lawsuit<AccountId, Balance> {
 	/// The account to whom the payment should be made if the proposal is accepted.
 	defendent: AccountId,
 	statement: Vec<u8>,
-	voters: Vec<AccountId>,
+	pub voters: Vec<AccountId>,
 	votes: Vec<bool>,
-	approved: bool,
+	pub approved: bool,
 }
 
 #[frame_support::pallet]
@@ -284,7 +283,7 @@ pub mod pallet {
 
 		#[pallet::call_index(2)]
 		#[pallet::weight((Weight::zero(), DispatchClass::Operational))]
-		pub fn close(origin: OriginFor<T>, lawsuit_id: u32) -> DispatchResult {
+		pub fn process_sue(origin: OriginFor<T>, lawsuit_id: u32) -> DispatchResult {
 			// Only root members can close the lawsuit
 			let _root = ensure_root(origin)?;
 			let mut proposal = <Proposals<T, I>>::get(lawsuit_id)
@@ -352,5 +351,13 @@ pub mod pallet {
 
 			Ok(())
 		}
+	}
+}
+
+impl<T: Config<I>, I: 'static> Pallet<T, I> {
+	pub fn contribution(beneficiary: T::AccountId) -> u32 {
+		Proposals::<T, I>::iter()
+			.filter(|(_, p)| p.approved && p.voters.contains(&beneficiary))
+			.count() as u32
 	}
 }
