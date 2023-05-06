@@ -52,7 +52,7 @@ Open a new terminal and start the second validator using the bob account.
 ```
 
 #### Prepare parachain node
-Follow the [polkadot official doc](https://docs.substrate.io/tutorials/build-a-parachain/connect-a-local-parachain/) to reserve a parachain identifier. The spec files are in the `chainspecs` folder. After that, follow following step the generate files for parachain node.
+Follow the [polkadot official doc](https://docs.substrate.io/tutorials/build-a-parachain/connect-a-local-parachain/) to reserve a parachain identifier. The spec files are in the `chainspecs` folder. After that, follow following steps to generate files for parachain node.
 Export the WebAssembly runtime for the parachain.
 ```
 ./target/release/saas3-dao-node export-genesis-wasm --chain chainspecs/raw-parachain-chainspec.json para-2000-wasm
