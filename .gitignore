@@ -17,5 +17,5 @@
 .idea
 .vscode
 
-para-2000-wasm
-para-2000-genesis-state
+#para-2000-wasm
+#para-2000-genesis-state

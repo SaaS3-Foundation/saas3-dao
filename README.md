@@ -77,3 +77,9 @@ Generate a parachain genesis state
 --port 30343 \
 --ws-port 9977
 ```
+
+#### Register with the local relay chain
+Follow link [connect to a local parachain](https://docs.substrate.io/tutorials/build-a-parachain/connect-a-local-parachain/#register-with-the-local-relay-chain) to register the parachain with the local relay chain.
+
+#### Connect to parachain
+Visit link [here](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A8844#/explorer) to connect to parachain.
