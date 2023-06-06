@@ -20,14 +20,14 @@
 use sp_core::H256;
 use sp_runtime::{
 	testing::Header,
-	traits::{BadOrigin, BlakeTwo256, Dispatchable, IdentityLookup},
+	traits::{BlakeTwo256, IdentityLookup},
 };
 
 use frame_support::{
-	assert_err_ignore_postinfo, assert_noop, assert_ok,
+	assert_noop, assert_ok,
 	pallet_prelude::GenesisBuild,
 	parameter_types,
-	traits::{ConstU32, ConstU64, OnInitialize},
+	traits::{ConstU32, ConstU64},
 	PalletId,
 };
 
@@ -37,8 +37,6 @@ use pallet_court as court;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
-type UtilityCall = pallet_utility::Call<Test>;
-type TreasuryCall = crate::Call<Test>;
 
 frame_support::construct_runtime!(
 	pub enum Test where
