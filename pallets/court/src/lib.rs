@@ -261,9 +261,9 @@ pub mod pallet {
 		pub fn vote_sue(origin: OriginFor<T>, lawsuit_id: u32, approve: bool) -> DispatchResult {
 			let voter = ensure_signed(origin)?;
 
-			let mut lawsuit = <Proposals<T, I>>::get(lawsuit_id)
-				.ok_or(Error::<T, I>::LawsuitNotFound)?;
-				//.clone();
+			let mut lawsuit =
+				<Proposals<T, I>>::get(lawsuit_id).ok_or(Error::<T, I>::LawsuitNotFound)?;
+			//.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure the voter hasn't voted before
@@ -283,9 +283,9 @@ pub mod pallet {
 		pub fn process_sue(origin: OriginFor<T>, lawsuit_id: u32) -> DispatchResult {
 			// Only root members can close the lawsuit
 			ensure_root(origin)?;
-			let mut proposal = <Proposals<T, I>>::get(lawsuit_id)
-				.ok_or(Error::<T, I>::ProposalNotFound)?;
-				//.clone();
+			let mut proposal =
+				<Proposals<T, I>>::get(lawsuit_id).ok_or(Error::<T, I>::ProposalNotFound)?;
+			//.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure that the proposal is not already approved

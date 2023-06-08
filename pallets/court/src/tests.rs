@@ -166,13 +166,12 @@ fn process_sue_before_vote() {
 		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
 		assert_noop!(
 			Court::process_sue(RuntimeOrigin::root(), 0),
-				Error::<Test, _>::VoterCountTooLow
-			);
+			Error::<Test, _>::VoterCountTooLow
+		);
 		assert_eq!(Court::approvals().len(), 0);
 		assert_eq!(Court::proposal_count(), 1);
 	});
 }
-
 
 #[test]
 fn remove_unapproved_sue() {
@@ -181,8 +180,8 @@ fn remove_unapproved_sue() {
 		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
 		assert_noop!(
 			Court::remove_sue(RuntimeOrigin::root(), 0),
-				Error::<Test, _>::ProposalNotApproved
-			);
+			Error::<Test, _>::ProposalNotApproved
+		);
 	});
 }
 
@@ -197,7 +196,7 @@ fn remove_approved_sue() {
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
 		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
 		assert_ok!(Court::remove_sue(RuntimeOrigin::root(), 0));
-	});	
+	});
 }
 
 #[test]

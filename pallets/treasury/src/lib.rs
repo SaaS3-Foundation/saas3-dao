@@ -188,8 +188,7 @@ pub mod pallet {
 
 	/// Error for the treasury pallet.
 	#[pallet::error]
-	pub enum Error<T, I = ()> 
-	{
+	pub enum Error<T, I = ()> {
 		/// The spend origin is valid but the amount it is allowed to spend is lower than the
 		/// amount to be spent.
 		InsufficientPermission,
@@ -272,7 +271,7 @@ pub mod pallet {
 				// there are claims
 				ensure!(bc - c >= amount, Error::<T, I>::ExceedClaim);
 				Claims::<T, I>::mutate(&beneficiary, |v| *v = Some(c + amount));
-			} else {	
+			} else {
 				ensure!(bc >= amount, Error::<T, I>::ExceedClaim);
 				Claims::<T, I>::insert(&beneficiary, amount);
 			}
