@@ -262,8 +262,8 @@ pub mod pallet {
 			let voter = ensure_signed(origin)?;
 
 			let mut lawsuit = <Proposals<T, I>>::get(lawsuit_id)
-				.ok_or(Error::<T, I>::LawsuitNotFound)?
-				.clone();
+				.ok_or(Error::<T, I>::LawsuitNotFound)?;
+				//.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure the voter hasn't voted before
@@ -282,17 +282,17 @@ pub mod pallet {
 		#[pallet::weight((Weight::zero(), DispatchClass::Operational))]
 		pub fn process_sue(origin: OriginFor<T>, lawsuit_id: u32) -> DispatchResult {
 			// Only root members can close the lawsuit
-			let _root = ensure_root(origin)?;
+			ensure_root(origin)?;
 			let mut proposal = <Proposals<T, I>>::get(lawsuit_id)
-				.ok_or(Error::<T, I>::ProposalNotFound)?
-				.clone();
+				.ok_or(Error::<T, I>::ProposalNotFound)?;
+				//.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure that the proposal is not already approved
 			ensure!(!proposal.approved, Error::<T, I>::ProposalAlreadyApproved);
 
 			// Update the tally of votes
-			let vote_count = proposal.votes.iter().filter(|v| **v == true).count() as u32;
+			let vote_count = proposal.votes.iter().filter(|v| **v).count() as u32;
 			let voter_count = proposal.votes.len();
 
 			ensure!(voter_count > 3, Error::<T, I>::VoterCountTooLow);
