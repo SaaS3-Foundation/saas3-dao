@@ -27,7 +27,7 @@ use frame_support::{
 	assert_noop, assert_ok,
 	pallet_prelude::GenesisBuild,
 	parameter_types,
-	traits::{ConstU32, ConstU64},
+	traits::{ConstU32, ConstU64, OnInitialize},
 	PalletId,
 };
 
@@ -142,12 +142,53 @@ fn receive_should_works() {
 }
 
 #[test]
+fn receive_from_zero_balance_should_fail() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&1, 1);
+		assert_noop!(
+			Treasury::receive(RuntimeOrigin::signed(1), 10, 1),
+			Error::<Test, _>::InsufficientFund
+		);
+	});
+}
+
+#[test]
 fn claim_rewards_exceed_claim() {
 	new_test_ext().execute_with(|| {
 		Balances::make_free_balance_be(&1, 101);
+		<Treasury as OnInitialize<u64>>::on_initialize(2);
 		assert_ok!(Treasury::receive(RuntimeOrigin::signed(1), 10, 1));
 		assert_noop!(
 			Treasury::claim_rewards(RuntimeOrigin::signed(1), 10),
+			Error::<Test, _>::ExceedClaim,
+		);
+	});
+}
+
+#[test]
+fn claim_rewards_ok() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&1, 101);
+		// funding by user 1
+		assert_ok!(Treasury::receive(RuntimeOrigin::signed(1), 10, 1));
+		// user 11 submit sue
+		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(11), 20, 0, vec![]));
+		// jury 2, 3, 4, 5 vote
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(2), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, false));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
+		// sue approved
+		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_eq!(Court::approvals().len(), 1);
+		assert_eq!(Court::proposal_count(), 1);
+
+		assert_eq!(Court::contribution(2), 1);
+
+		assert_ok!(Treasury::claim_rewards(RuntimeOrigin::signed(2), 1));
+		// claim again
+		assert_noop!(
+			Treasury::claim_rewards(RuntimeOrigin::signed(2), 1),
 			Error::<Test, _>::ExceedClaim
 		);
 	});

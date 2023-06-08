@@ -24,10 +24,10 @@ use sp_runtime::{
 };
 
 use frame_support::{
-	assert_ok,
+	assert_noop, assert_ok,
 	pallet_prelude::GenesisBuild,
 	parameter_types,
-	traits::{ConstU32, ConstU64},
+	traits::{ConstU32, ConstU64, OnInitialize},
 };
 
 use super::*;
@@ -113,6 +113,7 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 fn submite_sue_works() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
+		<Court as OnInitialize<u64>>::on_initialize(2);
 		assert_eq!(Court::approvals().len(), 0);
 		assert_eq!(Court::proposal_count(), 1);
 	});
@@ -134,8 +135,86 @@ fn process_sue_works() {
 		Balances::make_free_balance_be(&0, 101);
 		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(2), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
 		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
 		assert_eq!(Court::approvals().len(), 1);
 		assert_eq!(Court::proposal_count(), 1);
+	});
+}
+
+#[test]
+fn vote_against_works() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&0, 101);
+		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(2), 0, false));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, false));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
+		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_eq!(Court::approvals().len(), 0);
+		assert_eq!(Court::proposal_count(), 1);
+	});
+}
+
+#[test]
+fn process_sue_before_vote() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&0, 101);
+		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
+		assert_noop!(
+			Court::process_sue(RuntimeOrigin::root(), 0),
+				Error::<Test, _>::VoterCountTooLow
+			);
+		assert_eq!(Court::approvals().len(), 0);
+		assert_eq!(Court::proposal_count(), 1);
+	});
+}
+
+
+#[test]
+fn remove_unapproved_sue() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&0, 101);
+		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
+		assert_noop!(
+			Court::remove_sue(RuntimeOrigin::root(), 0),
+				Error::<Test, _>::ProposalNotApproved
+			);
+	});
+}
+
+#[test]
+fn remove_approved_sue() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&0, 101);
+		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(2), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
+		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_ok!(Court::remove_sue(RuntimeOrigin::root(), 0));
+	});	
+}
+
+#[test]
+fn contribution_works() {
+	new_test_ext().execute_with(|| {
+		Balances::make_free_balance_be(&0, 101);
+		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(2), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
+		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
+		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_eq!(Court::contribution(2), 1);
+		assert_eq!(Court::contribution(3), 1);
+		assert_eq!(Court::contribution(4), 1);
+		assert_eq!(Court::contribution(5), 1);
+		assert_eq!(Court::contribution(1), 0);
+		assert_eq!(Court::contribution(11), 0);
 	});
 }

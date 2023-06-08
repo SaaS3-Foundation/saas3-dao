@@ -25,7 +25,7 @@ cargo +nightly test
 ```
 
 ## Run a testnet
-#### Start relay chain
+#### 1. Start relay chain
 >Follow the [polkadot offcial doc](https://docs.substrate.io/tutorials/build-a-parachain/prepare-a-local-relay-chain/) or the following doc to run the relay chain.
 
 Before start, you need download polkadot release or build from source yourself. You can found downloaded relay chain spec from this repo, they are in the `chainspecs` folder.
@@ -46,12 +46,12 @@ Open a new terminal and start the second validator using the bob account.
 --bob \
 --validator \
 --base-path /tmp/relay/bob \
---chain ~/workhub/github/saas3-foundation/saas3-dao/chainspecs/raw-local-chainspec.json \
+--chain /path/to/saas3-dao/chainspecs/raw-local-chainspec.json \
 --port 30334 \
 --rpc-port 9945
 ```
 
-#### Prepare parachain node
+#### 2. Prepare parachain node
 Follow the [polkadot official doc](https://docs.substrate.io/tutorials/build-a-parachain/connect-a-local-parachain/) to reserve a parachain identifier. The spec files are in the `chainspecs` folder. After that, follow following steps to generate files for parachain node.
 Export the WebAssembly runtime for the parachain.
 ```
@@ -61,7 +61,7 @@ Generate a parachain genesis state
 ```
 ./target/release/saas3-dao-node export-genesis-state --chain chainspecs/raw-parachain-chainspec.json para-2000-genesis-state
 ```
-#### Start parachain node
+#### 3. Start parachain node
 ```
  ./target/release/saas3-dao-node \
 --alice \
@@ -78,8 +78,11 @@ Generate a parachain genesis state
 --ws-port 9977
 ```
 
-#### Register with the local relay chain
-Follow link [connect to a local parachain](https://docs.substrate.io/tutorials/build-a-parachain/connect-a-local-parachain/#register-with-the-local-relay-chain) to register the parachain with the local relay chain. check the `Register with the local relay chain` secton.
+#### 4. Register with the local relay chain
+Follow link [connect to a local parachain](https://docs.substrate.io/tutorials/build-a-parachain/connect-a-local-parachain/#register-with-the-local-relay-chain) to register the parachain with the local relay chain. check the `Register with the local relay chain` secton and follow the instructions to do the configuration.
 
-#### Connect to parachain
+#### 5. Connect to parachain
 Visit link [here](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A8844#/explorer) to connect to parachain.
+
+## Tutorial
+[Visit here](Tutorial.md)

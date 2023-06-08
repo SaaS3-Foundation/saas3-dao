@@ -211,12 +211,11 @@ pub mod pallet {
 		LawsuitNotFound,
 		DuplicateVote,
 		StatementOverSize,
+		VoterCountTooLow,
 	}
 
 	#[pallet::hooks]
 	impl<T: Config<I>, I: 'static> Hooks<BlockNumberFor<T>> for Pallet<T, I> {
-		/// ## Complexity
-		/// - `O(A)` where `A` is the number of approvals
 		fn on_initialize(_n: T::BlockNumber) -> Weight {
 			Weight::zero()
 		}
@@ -271,8 +270,6 @@ pub mod pallet {
 			ensure!(!lawsuit.voters.contains(&voter), Error::<T, I>::DuplicateVote);
 
 			// Add the voter and their vote to the lawsuit
-			//let mut voters = lawsuit.voters;
-			//let mut votes = lawsuit.votes;
 			lawsuit.voters.push(voter.clone());
 			lawsuit.votes.push(approve);
 			<Proposals<T, I>>::insert(lawsuit_id, lawsuit);
@@ -289,7 +286,6 @@ pub mod pallet {
 			let mut proposal = <Proposals<T, I>>::get(lawsuit_id)
 				.ok_or(Error::<T, I>::ProposalNotFound)?
 				.clone();
-			//let proposal = p.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure that the proposal is not already approved
@@ -298,7 +294,11 @@ pub mod pallet {
 			// Update the tally of votes
 			let vote_count = proposal.votes.iter().filter(|v| **v == true).count() as u32;
 			let voter_count = proposal.votes.len();
+
+			ensure!(voter_count > 3, Error::<T, I>::VoterCountTooLow);
+
 			let approval_threshold = (voter_count as u32) * 3 / 4; // Simple majority
+
 			if vote_count >= approval_threshold {
 				// Proposal is approved, execute the proposal
 				T::Currency::transfer(

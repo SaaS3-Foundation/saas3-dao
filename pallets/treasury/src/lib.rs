@@ -188,7 +188,8 @@ pub mod pallet {
 
 	/// Error for the treasury pallet.
 	#[pallet::error]
-	pub enum Error<T, I = ()> {
+	pub enum Error<T, I = ()> 
+	{
 		/// The spend origin is valid but the amount it is allowed to spend is lower than the
 		/// amount to be spent.
 		InsufficientPermission,
@@ -201,8 +202,6 @@ pub mod pallet {
 
 	#[pallet::hooks]
 	impl<T: Config<I>, I: 'static> Hooks<BlockNumberFor<T>> for Pallet<T, I> {
-		/// ## Complexity
-		/// - `O(A)` where `A` is the number of approvals
 		fn on_initialize(_n: T::BlockNumber) -> Weight {
 			Weight::zero()
 		}
@@ -264,16 +263,17 @@ pub mod pallet {
 
 			// fetch ended lawsuit
 			let cnt = pallet_court::Pallet::<T, I>::contribution(beneficiary.clone());
+			log::debug!("cnt: {:?}", cnt);
 			let bc = BalanceOf::<T, I>::from(cnt);
 
 			// calculate rewards - claimed rewards
 			let c = Claims::<T, I>::get(&beneficiary);
 			if let Some(c) = c {
 				// there are claims
-				ensure!(bc - c > amount, Error::<T, I>::ExceedClaim);
+				ensure!(bc - c >= amount, Error::<T, I>::ExceedClaim);
 				Claims::<T, I>::mutate(&beneficiary, |v| *v = Some(c + amount));
-			} else {
-				ensure!(bc > amount, Error::<T, I>::ExceedClaim);
+			} else {	
+				ensure!(bc >= amount, Error::<T, I>::ExceedClaim);
 				Claims::<T, I>::insert(&beneficiary, amount);
 			}
 
