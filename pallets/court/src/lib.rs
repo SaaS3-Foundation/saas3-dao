@@ -82,7 +82,7 @@ pub struct Lawsuit<AccountId, Balance> {
 pub mod pallet {
 	use super::*;
 	use frame_support::pallet_prelude::*;
-	use frame_system::{ensure_root, pallet_prelude::*};
+	use frame_system::pallet_prelude::*;
 
 	#[pallet::pallet]
 	#[pallet::without_storage_info]
@@ -263,7 +263,6 @@ pub mod pallet {
 
 			let mut lawsuit =
 				<Proposals<T, I>>::get(lawsuit_id).ok_or(Error::<T, I>::LawsuitNotFound)?;
-			//.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure the voter hasn't voted before
@@ -281,11 +280,9 @@ pub mod pallet {
 		#[pallet::call_index(2)]
 		#[pallet::weight((Weight::zero(), DispatchClass::Operational))]
 		pub fn process_sue(origin: OriginFor<T>, lawsuit_id: u32) -> DispatchResult {
-			// Only root members can close the lawsuit
-			ensure_root(origin)?;
+			ensure_signed_or_root(origin)?;
 			let mut proposal =
 				<Proposals<T, I>>::get(lawsuit_id).ok_or(Error::<T, I>::ProposalNotFound)?;
-			//.clone();
 			<Proposals<T, I>>::remove(lawsuit_id);
 
 			// Ensure that the proposal is not already approved
@@ -338,8 +335,7 @@ pub mod pallet {
 			origin: OriginFor<T>,
 			#[pallet::compact] lawsuit_id: ProposalIndex,
 		) -> DispatchResult {
-			ensure_root(origin)?;
-
+			ensure_signed_or_root(origin)?;
 			Approvals::<T, I>::try_mutate(|v| -> DispatchResult {
 				if let Some(index) = v.iter().position(|x| x == &lawsuit_id) {
 					v.remove(index);
