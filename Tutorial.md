@@ -72,7 +72,7 @@ Court.process_sue(origin, lawsuit_id)
 ```
 Replace `origin` with the jury member's address and `lawsuit_id` with the ID of the lawsuit to be processed. This step involves punishing the guilty party and distributing rewards to the jury members.
 
-> **_NOTE:_**  For now, only the root user can process a lawsuit. In the future, this functionality will be available to all jury members.
+> **_NOTE:_**  For now, every signed user can process a lawsuit. In the future, this functionality will be only available to jury members.
 
 Example Input:
 ```
