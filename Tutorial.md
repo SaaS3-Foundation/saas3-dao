@@ -31,14 +31,15 @@ Replace `origin` with the user's address, `value` with the desired value, `defen
 
 Example Input:
 ```
-origin: Bob
-value: 50
+origin: Ferdie
+value: 10
 defendant: Alice
-statement: "I demand compensation for damages."
+statement: "Ferdie sue alice for 10 coins"
 ```
 Example Output:
 
 The lawsuit is successfully submitted.
+![img](imgs/submit_sue.png)
 
 #### Step 3: Jury Voting
 The jury members can vote on a lawsuit by calling the `vote_sue` function from the Court pallet. Use the following code to vote on a lawsuit:
@@ -56,6 +57,11 @@ approve: true/false
 Example Output:
 
 The jury member's vote is recorded.
+![image](imgs/ferdie_vote_sue_true.png)
+![image](imgs/bob_vote_sue_true.png)
+![image](imgs/charlie_vote_sue_true.png)
+![image](imgs/dave_vote_sue_true.png)
+![image](imgs/storage_after_vote.png)
 
 > **_NOTE:_**  The lawsuit_id start from 0 and increment by 1 for each new lawsuit. Court pallet need at least 4 votes to process a lawsuit. So you need to call `vote_sue` function at least 4 times with 4 different account before you call process_sue function. At least 3 of the 4 votes must be the true value to approve a lawsuit.
 
@@ -70,12 +76,15 @@ Replace `origin` with the jury member's address and `lawsuit_id` with the ID of 
 
 Example Input:
 ```
-origin: root
+origin: alice
 lawsuit_id: 0
 ```
 Example Output:
 
 The lawsuit is processed, and appropriate actions are taken.
+
+![image](imgs/alice_process_sue.png)
+![image](imgs/storage_after_processed.png)
 
 #### Step 5: Claiming Rewards
 Jury members can claim their rewards by calling the `claim_rewards` function from the Treasury pallet. Use the following code to claim rewards:
@@ -86,12 +95,14 @@ Replace `origin` with the jury member's address and `amount` with the desired re
 
 Example Input:
 ```
-origin: Jury1
+origin: dave
 amount: 1
 ```
 Example Output:
 
 The rewards are successfully claimed.
+
+![image](imgs/dave_claimed_1_coin.png)
 
 Congratulations! You have now learned the basic usage of SaaS3-DAO. Feel free to explore more functionalities and features offered by the platform.
 
