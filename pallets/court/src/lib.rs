@@ -280,7 +280,7 @@ pub mod pallet {
 		#[pallet::call_index(2)]
 		#[pallet::weight((Weight::zero(), DispatchClass::Operational))]
 		pub fn process_sue(origin: OriginFor<T>, lawsuit_id: u32) -> DispatchResult {
-			ensure_signed_or_root(origin)?;
+			ensure_signed(origin)?;
 			let mut proposal =
 				<Proposals<T, I>>::get(lawsuit_id).ok_or(Error::<T, I>::ProposalNotFound)?;
 			<Proposals<T, I>>::remove(lawsuit_id);

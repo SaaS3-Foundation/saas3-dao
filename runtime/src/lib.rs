@@ -173,8 +173,8 @@ impl_opaque_keys! {
 
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("template-parachain"),
-	impl_name: create_runtime_str!("template-parachain"),
+	spec_name: create_runtime_str!("saas3-dao-local"),
+	impl_name: create_runtime_str!("saaas3-dao-local"),
 	authoring_version: 1,
 	spec_version: 1,
 	impl_version: 0,
@@ -346,6 +346,11 @@ impl pallet_balances::Config for Runtime {
 	type ReserveIdentifier = [u8; 8];
 }
 
+impl pallet_sudo::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type RuntimeCall = RuntimeCall;
+}
+
 parameter_types! {
 	/// Relay Chain `TransactionByteFee` / 10
 	pub const TransactionByteFee: Balance = 10 * MICROUNIT;
@@ -499,12 +504,16 @@ construct_runtime!(
 		CumulusXcm: cumulus_pallet_xcm = 32,
 		DmpQueue: cumulus_pallet_dmp_queue = 33,
 
+
 		// Template
 		TemplatePallet: pallet_template = 40,
 
 		Treasury: pallet_treasury = 50,
 
 		Court: pallet_court = 60,
+
+		// Sudo.
+		Sudo: pallet_sudo::{Pallet, Call, Storage, Event<T>, Config<T>} = 71,
 	}
 );
 
