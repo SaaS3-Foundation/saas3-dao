@@ -138,7 +138,7 @@ fn process_sue_works() {
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
-		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_ok!(Court::process_sue(RuntimeOrigin::signed(6), 0));
 		assert_eq!(Court::approvals().len(), 1);
 		assert_eq!(Court::proposal_count(), 1);
 	});
@@ -153,7 +153,7 @@ fn vote_against_works() {
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, false));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
-		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_ok!(Court::process_sue(RuntimeOrigin::signed(6), 0));
 		assert_eq!(Court::approvals().len(), 0);
 		assert_eq!(Court::proposal_count(), 1);
 	});
@@ -165,7 +165,7 @@ fn process_sue_before_vote() {
 		Balances::make_free_balance_be(&0, 101);
 		assert_ok!(Court::submit_sue(RuntimeOrigin::signed(1), 100, 0, vec![]));
 		assert_noop!(
-			Court::process_sue(RuntimeOrigin::root(), 0),
+			Court::process_sue(RuntimeOrigin::signed(6), 0),
 			Error::<Test, _>::VoterCountTooLow
 		);
 		assert_eq!(Court::approvals().len(), 0);
@@ -194,7 +194,7 @@ fn remove_approved_sue() {
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
-		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_ok!(Court::process_sue(RuntimeOrigin::signed(6), 0));
 		assert_ok!(Court::remove_sue(RuntimeOrigin::root(), 0));
 	});
 }
@@ -208,7 +208,7 @@ fn contribution_works() {
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(3), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
-		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_ok!(Court::process_sue(RuntimeOrigin::signed(6), 0));
 		assert_eq!(Court::contribution(2), 1);
 		assert_eq!(Court::contribution(3), 1);
 		assert_eq!(Court::contribution(4), 1);

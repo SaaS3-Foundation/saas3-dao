@@ -179,7 +179,7 @@ fn claim_rewards_ok() {
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(4), 0, true));
 		assert_ok!(Court::vote_sue(RuntimeOrigin::signed(5), 0, true));
 		// sue approved
-		assert_ok!(Court::process_sue(RuntimeOrigin::root(), 0));
+		assert_ok!(Court::process_sue(RuntimeOrigin::signed(6), 0));
 		assert_eq!(Court::approvals().len(), 1);
 		assert_eq!(Court::proposal_count(), 1);
 
